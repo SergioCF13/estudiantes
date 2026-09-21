@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¡Feliz Día del Estudiante! - Colegio Padre Luis Variara</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Dancing+Script:wght@700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:   #f9d342;
+      --orange: #f97316;
+      --pink:   #e91e63;
+      --purple: #a855f7;
+      --blue:   #3b82f6;
+      --green:  #22c55e;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .star {
+      position: absolute; background: #fff; border-radius: 50%;
+      animation: twinkle var(--dur) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.1; transform: scale(0.8); }
+      to   { opacity: 0.9; transform: scale(1.2); }
+    }
+
+    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+    /* ══════════════════════════════════════════
+       PANTALLA DE SELECCIÓN
+    ══════════════════════════════════════════ */
+    #selector-screen {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 860px;
+      animation: fadeSlideIn 0.8s ease both;
+    }
+
+    #selector-screen h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      color: #fff; text-align: center; margin-bottom: 6px;
+    }
+    #selector-screen .sub {
+      text-align: center; color: rgba(255,255,255,0.55);
+      font-size: 0.88rem; margin-bottom: 32px; letter-spacing: 1px;
+    }
+
+    .grade-section { margin-bottom: 26px; }
+    .grade-label {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 12px; padding-left: 4px;
+    }
+    .parallel-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .course-btn {
+      flex: 1 1 100px; min-width: 100px;
+      padding: 16px 10px; border-radius: 16px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: #fff; font-family: 'Poppins', sans-serif;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: transform .18s, background .18s, border-color .18s, box-shadow .18s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      backdrop-filter: blur(8px);
+    }
+    .course-btn .grade-num  { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+    .course-btn .parallel   { font-size: 0.75rem; opacity: .75; letter-spacing: 1px; }
+    .course-btn:hover {
+      transform: translateY(-4px) scale(1.04);
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    .g1 { border-color: rgba(34,197,94,.4); }
+    .g1:hover { box-shadow: 0 8px 28px rgba(34,197,94,.35); border-color: var(--green); }
+    .g2 { border-color: rgba(59,130,246,.4); }
+    .g2:hover { box-shadow: 0 8px 28px rgba(59,130,246,.35); border-color: var(--blue); }
+    .g3 { border-color: rgba(168,85,247,.4); }
+    .g3:hover { box-shadow: 0 8px 28px rgba(168,85,247,.35); border-color: var(--purple); }
+    .g4 { border-color: rgba(249,211,66,.4); }
+    .g4:hover { box-shadow: 0 8px 28px rgba(249,211,66,.35); border-color: var(--gold); }
+    .g5 { border-color: rgba(249,115,22,.4); }
+    .g5:hover { box-shadow: 0 8px 28px rgba(249,115,22,.35); border-color: var(--orange); }
+
+    .g6 {
+      flex: 1 1 160px;
+      border-color: rgba(249,211,66,.6);
+      background: rgba(249,211,66,0.1);
+    }
+    .g6 .grade-num { font-size: 1.8rem; }
+    .g6:hover {
+      background: rgba(249,211,66,.22);
+      border-color: var(--gold);
+      box-shadow: 0 10px 36px rgba(249,211,66,.45);
+    }
+    .promo-tag {
+      font-size: 0.6rem;
+      background: linear-gradient(90deg, var(--gold), var(--orange));
+      color: #1a1a2e; font-weight: 700;
+      padding: 2px 8px; border-radius: 99px; letter-spacing: 1px;
+    }
+
+    /* ══════════════════════════════════════════
+       PANTALLA DE FELICITACIÓN
+    ══════════════════════════════════════════ */
+    #congrats-screen {
+      display: none; position: relative; z-index: 10;
+      width: 100%; max-width: 780px;
+      animation: fadeSlideIn 0.9s ease both;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(55px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 28px; width: 100%;
+      padding: 50px 40px 40px; text-align: center;
+      box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+    }
+
+    .course-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 20px; border-radius: 99px;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 2px;
+      margin-bottom: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2); color: #fff;
+    }
+    .course-badge.promo {
+      background: linear-gradient(135deg,rgba(249,211,66,.2),rgba(249,115,22,.2));
+      border-color: rgba(249,211,66,.5); color: var(--gold);
+    }
+
+    .icon-wrap {
+      font-size: 76px; line-height: 1; margin-bottom: 16px;
+      animation: pop .7s cubic-bezier(.36,1.56,.64,1) both;
+    }
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .school {
+      font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 6px;
+    }
+    .fecha { font-size: 0.76rem; color: rgba(255,255,255,.5); margin-bottom: 24px; }
+
+    .title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.2rem, 6.5vw, 3.8rem);
+      color: #fff; line-height: 1.15; margin-bottom: 10px;
+    }
+    .title span {
+      background: linear-gradient(90deg, var(--gold), var(--orange), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .title.promo-title span {
+      background: linear-gradient(90deg,#f9d342,#f97316,#fff,#f9d342);
+      background-size: 200%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer {
+      from { background-position: 0%; } to { background-position: 200%; }
+    }
+
+    .subtitle { font-size: clamp(.95rem,2.8vw,1.15rem); color: rgba(255,255,255,.7); margin-bottom: 28px; }
+    .divider { width: 80px; height: 4px; background: linear-gradient(90deg,var(--gold),var(--pink)); border-radius: 99px; margin: 0 auto 28px; }
+
+    .message {
+      font-size: clamp(.9rem,2.1vw,1.02rem);
+      color: rgba(255,255,255,.82); line-height: 1.9;
+      max-width: 590px; margin: 0 auto 34px;
+    }
+    .message strong { color: var(--gold); }
+
+    .btn-row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      padding: 13px 36px; border-radius: 99px;
+      font-family: 'Poppins', sans-serif; font-weight: 700;
+      font-size: .95rem; letter-spacing: 1px;
+      cursor: pointer; border: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,var(--gold),var(--orange));
+      color: #1a1a2e; box-shadow: 0 6px 28px rgba(249,211,66,.4);
+    }
+    .btn-secondary { background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.2); }
+    .btn:hover { transform: translateY(-3px) scale(1.04); }
+    .btn:active { transform: scale(.97); }
+
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
+    .chip {
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+      color: rgba(255,255,255,.75); padding: 5px 16px;
+      border-radius: 99px; font-size: .75rem; letter-spacing: 1px;
+    }
+
+    .footer {
+      position: relative; z-index: 1; margin-top: 18px;
+      font-size: .66rem; color: rgba(255,255,255,.3);
+      letter-spacing: 1.5px; text-align: center;
+    }
+
+    /* ── Botón música ── */
+    #music-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 100;
+      width: 54px; height: 54px; border-radius: 50%; border: none;
+      cursor: pointer; font-size: 1.4rem;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg,var(--gold),var(--orange));
+      box-shadow: 0 4px 20px rgba(249,211,66,.45);
+      transition: transform .2s, box-shadow .2s;
+    }
+    #music-btn:hover { transform: scale(1.12); }
+    #music-btn.playing { animation: pulse-ring 1.8s ease-out infinite; }
+    @keyframes pulse-ring {
+      0%  { box-shadow: 0 0 0 0   rgba(249,211,66,.6); }
+      70% { box-shadow: 0 0 0 18px rgba(249,211,66,0); }
+      100%{ box-shadow: 0 0 0 0   rgba(249,211,66,0); }
+    }
+
+    #sound-banner {
+      position: fixed; bottom: 94px; right: 28px; z-index: 100;
+      background: rgba(255,255,255,.1); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.18); color: #fff;
+      font-size: .73rem; padding: 8px 14px; border-radius: 12px;
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .4s, transform .4s;
+    }
+    #sound-banner.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 520px) {
+      .card { padding: 36px 18px 28px; }
+      #music-btn { bottom: 16px; right: 16px; }
+      #sound-banner { right: 16px; bottom: 82px; }
+      .course-btn { min-width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ══════════════════════════════════════════
+       PANTALLA 1 — SELECCIÓN DE CURSO
+  ══════════════════════════════════════════ -->
+  <div id="selector-screen">
+    <h2>🎓 ¿A qué curso perteneces?</h2>
+    <p class="sub">Colegio Padre Luis Variara · 21 de Septiembre, 2026</p>
+
+    <div class="grade-section">
+      <p class="grade-label">🟢 Primer Grado</p>
+      <div class="parallel-grid">
+        <button class="course-btn g1" onclick="showCongrats('1A')"><span class="grade-num">1°</span><span class="parallel">Paralelo A</span></button>
+        <button class="course-btn g1" onclick="showCongrats('1B')"><span class="grade-num">1°</span><span class="parallel">Paralelo B</span></button>
+        <button class="course-btn g1" onclick="showCongrats('1C')"><span class="grade-num">1°</span><span class="parallel">Paralelo C</span></button>
+      </div>
+    </div>
+
+    <div class="grade-section">
+      <p class="grade-label">🔵 Segundo Grado</p>
+      <div class="parallel-grid">
+        <button class="course-btn g2" onclick="showCongrats('2A')"><span class="grade-num">2°</span><span class="parallel">Paralelo A</span></button>
+        <button class="course-btn g2" onclick="showCongrats('2B')"><span class="grade-num">2°</span><span class="parallel">Paralelo B</span></button>
+        <button class="course-btn g2" onclick="showCongrats('2C')"><span class="grade-num">2°</span><span class="parallel">Paralelo C</span></button>
+      </div>
+    </div>
+
+    <div class="grade-section">
+      <p class="grade-label">🟣 Tercer Grado</p>
+      <div class="parallel-grid">
+        <button class="course-btn g3" onclick="showCongrats('3A')"><span class="grade-num">3°</span><span class="parallel">Paralelo A</span></button>
+        <button class="course-btn g3" onclick="showCongrats('3B')"><span class="grade-num">3°</span><span class="parallel">Paralelo B</span></button>
+        <button class="course-btn g3" onclick="showCongrats('3C')"><span class="grade-num">3°</span><span class="parallel">Paralelo C</span></button>
+      </div>
+    </div>
+
+    <div class="grade-section">
+      <p class="grade-label">🟡 Cuarto Grado</p>
+      <div class="parallel-grid">
+        <button class="course-btn g4" onclick="showCongrats('4A')"><span class="grade-num">4°</span><span class="parallel">Paralelo A</span></button>
+        <button class="course-btn g4" onclick="showCongrats('4B')"><span class="grade-num">4°</span><span class="parallel">Paralelo B</span></button>
+        <button class="course-btn g4" onclick="showCongrats('4C')"><span class="grade-num">4°</span><span class="parallel">Paralelo C</span></button>
+      </div>
+    </div>
+
+    <div class="grade-section">
+      <p class="grade-label">🟠 Quinto Grado</p>
+      <div class="parallel-grid">
+        <button class="course-btn g5" onclick="showCongrats('5A')"><span class="grade-num">5°</span><span class="parallel">Paralelo A</span></button>
+        <button class="course-btn g5" onclick="showCongrats('5B')"><span class="grade-num">5°</span><span class="parallel">Paralelo B</span></button>
+        <button class="course-btn g5" onclick="showCongrats('5C')"><span class="grade-num">5°</span><span class="parallel">Paralelo C</span></button>
+      </div>
+    </div>
+
+    <div class="grade-section">
+      <p class="grade-label">🏆 Sexto Grado — ¡La Promoción!</p>
+      <div class="parallel-grid">
+        <button class="course-btn g6" onclick="showCongrats('6A')">
+          <span class="grade-num">6°</span><span class="parallel">Paralelo A</span>
+          <span class="promo-tag">PROMOCIÓN</span>
+        </button>
+        <button class="course-btn g6" onclick="showCongrats('6B')">
+          <span class="grade-num">6°</span><span class="parallel">Paralelo B</span>
+          <span class="promo-tag">PROMOCIÓN</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PANTALLA 2 — FELICITACIÓN PERSONALIZADA
+  ══════════════════════════════════════════ -->
+  <div id="congrats-screen">
+    <div class="card">
+      <div id="badge-wrap"></div>
+      <div class="icon-wrap" id="main-icon">🎉</div>
+      <p class="school">Colegio Padre Luis Variara</p>
+      <p class="fecha">21 de Septiembre, 2026</p>
+      <h1 id="main-title" class="title"></h1>
+      <p  id="main-subtitle" class="subtitle"></p>
+      <div class="divider"></div>
+      <p  id="main-message" class="message"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="celebrar-btn">🎉 ¡Celebrar!</button>
+        <button class="btn btn-secondary" onclick="goBack()">← Cambiar curso</button>
+      </div>
+      <div class="chips" id="chips-wrap"></div>
+    </div>
+    <p class="footer">Autor: Sergio Canaviri Felix</p>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="https://archive.org/download/happy-background-music/children-song-happy.mp3" type="audio/mpeg" />
+    <source src="https://archive.org/download/happy-background-music/feeling-happy.mp3" type="audio/mpeg" />
+  </audio>
+  <div id="sound-banner">🎵 Haz clic para activar la música</div>
+  <button id="music-btn" aria-label="Activar música">🔇</button>
+
+  <script>
+  // ── Estrellas ─────────────────────────────────────────────────────────────
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 3 + 1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${(Math.random()*3+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+    starsEl.appendChild(s);
+  }
+
+  // ── Confetti ──────────────────────────────────────────────────────────────
+  const cvs = document.getElementById('confetti-canvas');
+  const ctx = cvs.getContext('2d');
+  let particles = [], animId = null;
+  const COLORS = ['#f9d342','#f97316','#e91e63','#3b82f6','#22c55e','#a855f7','#ec4899','#06b6d4'];
+
+  function resizeCvs(){ cvs.width = innerWidth; cvs.height = innerHeight; }
+  resizeCvs(); window.addEventListener('resize', resizeCvs);
+
+  function Particle(gold){
+    this.x = Math.random()*cvs.width; this.y = -10;
+    this.r = Math.random()*7+4;
+    this.color = gold ? ['#f9d342','#fde68a','#fbbf24','#fff','#f97316'][Math.floor(Math.random()*5)] : COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.speed = Math.random()*4+2; this.angle = Math.random()*Math.PI*2;
+    this.spin  = (Math.random()-.5)*.15; this.drift = (Math.random()-.5)*1.5;
+    this.shape = Math.random()<.5?'rect':'circle';
+  }
+
+  function launchConfetti(n,gold){ for(let i=0;i<n;i++) particles.push(new Particle(gold)); }
+
+  function drawConfetti(){
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    particles.forEach(p=>{
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle); ctx.fillStyle=p.color;
+      if(p.shape==='rect') ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*.5);
+      else { ctx.beginPath(); ctx.arc(0,0,p.r/2,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
+      p.y+=p.speed; p.x+=p.drift; p.angle+=p.spin;
+    });
+    particles = particles.filter(p=>p.y<cvs.height+20);
+    if(particles.length>0) animId=requestAnimationFrame(drawConfetti);
+    else { ctx.clearRect(0,0,cvs.width,cvs.height); animId=null; }
+  }
+
+  function startConfetti(gold=false){
+    if(animId) cancelAnimationFrame(animId);
+    particles=[]; launchConfetti(220,gold);
+    animId=requestAnimationFrame(drawConfetti);
+    setTimeout(()=>launchConfetti(150,gold),800);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  MENSAJES ÚNICOS POR CURSO
+  // ══════════════════════════════════════════════════════════════════════════
+  const CURSOS = {
+
+    '1A': {
+      icon: '🌱', badge: '1° Paralelo A', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los pequeños grandes del <strong>1° "A"</strong> 🌟',
+      message: `Queridos estudiantes del <strong>Primer Grado "A"</strong>, ustedes son las semillitas más nuevas y brillantes del Colegio Padre Luis Variara.<br><br>
+        Cada mañana llegan con esa sonrisa enorme y esas ganas de aprender que nos llenan el corazón a todos sus profesores. Hoy, en su <strong>Día del Estudiante</strong>, queremos decirles que son increíbles y que estamos muy orgullosos de cada uno de ustedes.<br><br>
+        ¡Sigan creciendo con esa alegría tan especial que los caracteriza! 🌻`,
+      chips: ['🌱 Nuevos exploradores','✏️ Escritores en potencia','🔢 Matemáticos del futuro','💚 Llenos de energía'],
+      gold: false,
+    },
+
+    '1B': {
+      icon: '⭐', badge: '1° Paralelo B', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Un abrazo enorme para el <strong>1° "B"</strong> 🎈',
+      message: `Estudiantes del <strong>Primer Grado "B"</strong>, ¡qué alegría tan grande es acompañarlos cada día en este camino del aprendizaje!<br><br>
+        Sus preguntas curiosas y su risa contagiosa hacen de nuestras clases un lugar mágico. Cada letra que aprenden, cada número que descubren, es un paso gigante en su vida.<br><br>
+        Hoy es <strong>su día</strong> y merecen toda la celebración del mundo. ¡Los queremos muchísimo, 1° "B"! 🎈`,
+      chips: ['⭐ Curiosos por naturaleza','📖 Lectores valientes','🎨 Artistas en ciernes','🤝 Grandes amigos'],
+      gold: false,
+    },
+
+    '1C': {
+      icon: '🦋', badge: '1° Paralelo C', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Con todo el cariño para el <strong>1° "C"</strong> 🌈',
+      message: `¡Feliz Día del Estudiante, queridos niños y niñas del <strong>Primer Grado "C"</strong>!<br><br>
+        Ustedes son como mariposas que recién empiezan a desplegar sus alas. Cada día en el colegio es una aventura nueva llena de colores, palabras y descubrimientos maravillosos.<br><br>
+        Sus profesores admiran su valentía para aprender cosas nuevas. ¡Sigan volando alto, pequeños del <strong>1° "C"</strong>! 🦋🌈`,
+      chips: ['🦋 En pleno vuelo','🌈 Llenos de color','📚 Aprendices valientes','💛 Con amor al estudio'],
+      gold: false,
+    },
+
+    '2A': {
+      icon: '🚀', badge: '2° Paralelo A', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los astronautas del saber del <strong>2° "A"</strong> 🚀',
+      message: `¡Felicitaciones, estudiantes del <strong>Segundo Grado "A"</strong>! Ya llevan un año de experiencia y se nota: llegaron al segundo grado con más fuerza, más ideas y más ganas que nunca.<br><br>
+        Son como pequeños cohetes listos para despegar hacia el conocimiento. Su dedicación y su compañerismo hacen del <strong>2° "A"</strong> un curso muy especial en nuestro colegio.<br><br>
+        Hoy los celebramos con todo el entusiasmo que ustedes merecen. ¡Sigan adelante! 🚀`,
+      chips: ['🚀 Listos para despegar','🧠 Mentes brillantes','📐 Exactos y creativos','🤸 Con energía ilimitada'],
+      gold: false,
+    },
+
+    '2B': {
+      icon: '🌊', badge: '2° Paralelo B', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los exploradores del <strong>2° "B"</strong> 🌊',
+      message: `Queridos estudiantes del <strong>Segundo Grado "B"</strong>, hoy es completamente de ustedes y lo celebramos con toda la alegría posible.<br><br>
+        Como las olas del mar, ustedes avanzan con constancia y fuerza, superando cada desafío con valentía. Su energía positiva y su buena disposición para aprender son admirable.<br><br>
+        Gracias por hacer tan especiales cada clase. ¡Los queremos, <strong>2° "B"</strong>! 🌊💙`,
+      chips: ['🌊 Constantes y fuertes','💙 Unidos como equipo','📝 Siempre atentos','🌟 Llenos de talento'],
+      gold: false,
+    },
+
+    '2C': {
+      icon: '🎯', badge: '2° Paralelo C', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Con mucho orgullo para el <strong>2° "C"</strong> 🎯',
+      message: `¡Feliz Día del Estudiante a los maravillosos chicos del <strong>Segundo Grado "C"</strong>!<br><br>
+        Cada uno de ustedes tiene un talento único y especial. Algunos con los números, otros con las palabras, otros con el dibujo... pero todos con el mismo objetivo: crecer y aprender.<br><br>
+        Sus profesores están muy orgullosos de ver cómo se superan día a día. Hoy los celebramos a ustedes, ¡que son lo más bonito del <strong>2° "C"</strong>! 🎯✨`,
+      chips: ['🎯 Enfocados en crecer','✨ Talentos únicos','📚 Con dedicación','🏅 Campeones del esfuerzo'],
+      gold: false,
+    },
+
+    '3A': {
+      icon: '🔬', badge: '3° Paralelo A', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los científicos del <strong>3° "A"</strong> 🔬',
+      message: `¡Un fuerte abrazo a los estudiantes del <strong>Tercer Grado "A"</strong> en su día especial!<br><br>
+        Ustedes han demostrado una curiosidad científica extraordinaria: preguntan, experimentan, descubren. Cada lección se convierte en un laboratorio donde todo es posible gracias a su entusiasmo.<br><br>
+        Hoy, sus profesores del Colegio Padre Luis Variara los felicitan con orgullo y les recuerdan: <strong>el conocimiento que adquieren hoy es el poder que tendrán mañana</strong>. ¡Sigan investigando, <strong>3° "A"</strong>! 🔬🧪`,
+      chips: ['🔬 Mentes científicas','🧪 Siempre experimentando','🌍 Conociendo el mundo','💡 Ideas que iluminan'],
+      gold: false,
+    },
+
+    '3B': {
+      icon: '🎨', badge: '3° Paralelo B', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los artistas del <strong>3° "B"</strong> 🎨',
+      message: `¡Feliz Día del Estudiante, queridos chicos del <strong>Tercer Grado "B"</strong>!<br><br>
+        Su creatividad no tiene límites. Cada vez que toman un lápiz, cuentan una historia; cada vez que abren un libro, viajan a otro mundo. Esa sensibilidad y ese amor por el aprendizaje los hacen únicos.<br><br>
+        Sus profesores los admiran porque en el <strong>3° "B"</strong> se respira alegría, compañerismo y muchas ganas de crecer. ¡Hoy y siempre, son lo mejor! 🎨🌟`,
+      chips: ['🎨 Creativos sin límites','📖 Viajeros de la lectura','🌟 Llenos de sensibilidad','🤝 Gran compañerismo'],
+      gold: false,
+    },
+
+    '3C': {
+      icon: '⚡', badge: '3° Paralelo C', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los líderes del <strong>3° "C"</strong> ⚡',
+      message: `¡Felicitaciones a los energéticos y talentosos estudiantes del <strong>Tercer Grado "C"</strong>!<br><br>
+        Ustedes son la energía viva del colegio. Con su carácter fuerte, su liderazgo natural y sus ganas de comerse el mundo, el <strong>3° "C"</strong> deja huella en cada rincón del Padre Luis Variara.<br><br>
+        Hoy los celebramos y les decimos: esa fuerza que tienen dentro los llevará muy lejos. ¡Nunca la pierdan! ⚡💪`,
+      chips: ['⚡ Energía desbordante','💪 Líderes naturales','🏆 Siempre dando el máximo','🌟 Huellan donde pasan'],
+      gold: false,
+    },
+
+    '4A': {
+      icon: '🌍', badge: '4° Paralelo A', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los ciudadanos del mundo del <strong>4° "A"</strong> 🌍',
+      message: `¡Feliz Día del Estudiante a los increíbles chicos del <strong>Cuarto Grado "A"</strong>!<br><br>
+        Con cada año que pasa, ustedes se convierten en personas más sabias, más empáticas y más conscientes del mundo que los rodea. Su capacidad de reflexión y su madurez nos sorprende y emociona.<br><br>
+        Sus profesores están seguros de que el <strong>4° "A"</strong> está formando a <strong>grandes ciudadanos del futuro</strong>. Hoy los celebramos a lo grande. ¡Merecen todo lo bueno! 🌍✨`,
+      chips: ['🌍 Ciudadanos del futuro','🧭 Con criterio propio','📚 Lectores comprometidos','💫 En constante crecimiento'],
+      gold: false,
+    },
+
+    '4B': {
+      icon: '🎵', badge: '4° Paralelo B', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para la orquesta de talentos del <strong>4° "B"</strong> 🎵',
+      message: `¡Un gran abrazo a los estudiantes del <strong>Cuarto Grado "B"</strong> en este hermoso Día del Estudiante!<br><br>
+        Como una orquesta perfecta, cada uno de ustedes aporta su nota única al coro del <strong>4° "B"</strong>. Juntos crean algo hermoso: un curso lleno de diversidad, talento y mucha armonía.<br><br>
+        Sus profesores valoran enormemente el esfuerzo de cada uno. <strong>Hoy es su día y lo celebramos con toda la música del mundo</strong>. ¡Sigan tocando, chicos! 🎵🎶`,
+      chips: ['🎵 Armonía en el aula','🎶 Talentos en sintonía','🌟 Cada uno único','💛 Unidos hacen magia'],
+      gold: false,
+    },
+
+    '4C': {
+      icon: '🏅', badge: '4° Paralelo C', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los campeones del <strong>4° "C"</strong> 🏅',
+      message: `¡Felicitaciones, estudiantes campeones del <strong>Cuarto Grado "C"</strong>!<br><br>
+        El esfuerzo que ponen en cada examen, en cada tarea, en cada proyecto es digno de una medalla de oro. Ustedes demuestran que el éxito no es suerte, sino el resultado del trabajo constante.<br><br>
+        Hoy, sus profesores los aplauden de pie y les dicen: <strong>el camino que están trazando los llevará a cimas increíbles</strong>. ¡Feliz Día del Estudiante, <strong>4° "C"</strong>! 🏅🥇`,
+      chips: ['🏅 Campeones del esfuerzo','🥇 Trabajo que da frutos','📝 Constantes y dedicados','🌠 Rumbo a las cimas'],
+      gold: false,
+    },
+
+    '5A': {
+      icon: '🌠', badge: '5° Paralelo A', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para las estrellas del <strong>5° "A"</strong> 🌠',
+      message: `¡Feliz y muy merecido Día del Estudiante a los estudiantes del <strong>Quinto Grado "A"</strong>!<br><br>
+        Están en uno de los grados más importantes de su formación y lo llevan con una madurez que admira a todos. Su responsabilidad, su compañerismo y su inteligencia hacen que el <strong>5° "A"</strong> sea un referente en el colegio.<br><br>
+        Sus profesores saben que cada uno de ustedes tiene una estrella propia. Hoy brilla más fuerte que nunca. ¡Los queremos! 🌠💫`,
+      chips: ['🌠 Estrellas en ascenso','💫 Madurez admirable','🎓 Casi en la cima','🔥 Con fuego propio'],
+      gold: false,
+    },
+
+    '5B': {
+      icon: '🦁', badge: '5° Paralelo B', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los valientes leones del <strong>5° "B"</strong> 🦁',
+      message: `¡Felicitaciones a los valerosos estudiantes del <strong>Quinto Grado "B"</strong>!<br><br>
+        Como leones, enfrentan cada desafío académico con valentía y determinación. No le tienen miedo a las materias difíciles, a los exámenes complicados ni a los proyectos retadores. Esa actitud es la que construye grandes personas.<br><br>
+        Hoy los celebramos por ser tan fuertes, tan unidos y tan comprometidos. <strong>El 5° "B" ruge fuerte</strong> y sus profesores están orgullosos. ¡Adelante, leones! 🦁🔥`,
+      chips: ['🦁 Valientes y fuertes','🔥 Pasión por aprender','🤝 Equipo indestructible','🏆 Listos para lo que venga'],
+      gold: false,
+    },
+
+    '5C': {
+      icon: '🧭', badge: '5° Paralelo C', badgeClass: '',
+      title: '¡Feliz <span>Día del Estudiante!</span>',
+      titleClass: 'title',
+      subtitle: 'Para los exploradores del <strong>5° "C"</strong> 🧭',
+      message: `¡Un abrazo enorme y lleno de cariño para los estudiantes del <strong>Quinto Grado "C"</strong> en su día!<br><br>
+        Están en la recta final antes de enfrentar el gran reto del sexto grado, y lo hacen con una preparación sólida y un espíritu aventurero único. Como buenos exploradores, cada nuevo conocimiento es un territorio que conquistan con entusiasmo.<br><br>
+        Sus profesores confían plenamente en ustedes. <strong>El próximo año les espera una aventura aún más grande</strong> y están más que listos. ¡Feliz Día del Estudiante, <strong>5° "C"</strong>! 🧭🌟`,
+      chips: ['🧭 Exploradores del saber','🌟 Listos para lo que viene','💪 Sólidos y preparados','🗺️ Trazando su propio mapa'],
+      gold: false,
+    },
+
+    // ── PROMOCIÓN ────────────────────────────────────────────────────────────
+
+    '6A': {
+      icon: '🎓🏆', badge: '6° Paralelo A — Promoción', badgeClass: 'promo',
+      title: '¡Felicitaciones,<br><span>Promoción "A"!</span>',
+      titleClass: 'title promo-title',
+      subtitle: 'El orgullo más grande del Colegio Padre Luis Variara 🌟',
+      message: `Querida <strong>Promoción del 6° "A"</strong>, hoy sus profesores no encuentran palabras suficientes para expresar el orgullo que sienten por ustedes.<br><br>
+        Recorrieron este camino con entereza y pasión. Los vimos crecer, madurar, tropezar y levantarse. Y en cada caída, eligieron levantarse con más fuerza. Eso es lo que los hace <strong>extraordinarios</strong>.<br><br>
+        Hoy, en el <strong>Día del Estudiante</strong>, también celebramos que están a un paso de culminar esta etapa hermosa. Salen de aquí con valores sólidos, con conocimientos que nadie les puede quitar y con el nombre del Padre Luis Variara grabado en el corazón.<br><br>
+        <strong>¡El mundo ya los está esperando, Promoción "A"! Vuelen alto y nunca olviden de dónde vienen.</strong> 💛🎓`,
+      chips: ['🎓 La Promoción del colegio','💛 Orgullo de sus profesores','🌍 Listos para el mundo','🏆 Lo lograron'],
+      gold: true,
+    },
+
+    '6B': {
+      icon: '🎓✨', badge: '6° Paralelo B — Promoción', badgeClass: 'promo',
+      title: '¡Felicitaciones,<br><span>Promoción "B"!</span>',
+      titleClass: 'title promo-title',
+      subtitle: 'La generación que dejará su huella para siempre 💫',
+      message: `¡Qué día tan especial para la <strong>Promoción del 6° "B"</strong>! Sus profesores los miran hoy y sienten una mezcla de orgullo, emoción y mucho, mucho cariño.<br><br>
+        Cada uno de ustedes llegó al primer día de clases como una página en blanco, y hoy esa página está llena de historias, aprendizajes, amistades y logros que nadie les podrá arrebatar.<br><br>
+        El <strong>6° "B"</strong> ha sido un curso que dejó su marca en este colegio: con su alegría, su creatividad, su solidaridad y su forma única de ver el mundo. Se van, pero su huella queda aquí para siempre.<br><br>
+        <strong>Gracias por enseñarnos también a nosotros. ¡Adelante, Promoción "B"! El futuro ya los espera con los brazos abiertos.</strong> ✨🎓`,
+      chips: ['✨ Una generación única','💫 Su huella es eterna','🌠 Rumbo al futuro','❤️ Siempre en nuestro corazón'],
+      gold: true,
+    },
+
+  };
+
+  // ── Mostrar felicitación ───────────────────────────────────────────────────
+  function showCongrats(key) {
+    const d = CURSOS[key];
+    if (!d) return;
+
+    document.getElementById('badge-wrap').innerHTML =
+      `<div class="course-badge ${d.badgeClass}">${d.badge}</div>`;
+    document.getElementById('main-icon').textContent = d.icon;
+    document.getElementById('main-title').innerHTML  = d.title;
+    document.getElementById('main-title').className  = d.titleClass;
+    document.getElementById('main-subtitle').innerHTML = d.subtitle;
+    document.getElementById('main-message').innerHTML  = d.message;
+    document.getElementById('chips-wrap').innerHTML =
+      d.chips.map(c=>`<span class="chip">${c}</span>`).join('');
+
+    document.getElementById('selector-screen').style.display = 'none';
+    const cs = document.getElementById('congrats-screen');
+    cs.style.display = 'block';
+    cs.style.animation = 'none';
+    void cs.offsetWidth;
+    cs.style.animation = 'fadeSlideIn 0.9s ease both';
+
+    setTimeout(() => startConfetti(d.gold), 400);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Botón celebrar
+    const btn = document.getElementById('celebrar-btn');
+    btn.onclick = function() {
+      startConfetti(d.gold);
+      this.textContent = d.gold ? '🏆 ¡Viva la Promoción!' : '🎊 ¡Vivan los Estudiantes!';
+      this.style.background = d.gold
+        ? 'linear-gradient(135deg,#f9d342,#fff200,#f9d342)'
+        : 'linear-gradient(135deg,#e91e63,#a855f7)';
+      setTimeout(() => {
+        this.textContent = '🎉 ¡Celebrar!';
+        this.style.background = 'linear-gradient(135deg,#f9d342,#f97316)';
+      }, 3000);
+    };
+  }
+
+  function goBack() {
+    document.getElementById('congrats-screen').style.display = 'none';
+    const ss = document.getElementById('selector-screen');
+    ss.style.display = 'block';
+    ss.style.animation = 'none';
+    void ss.offsetWidth;
+    ss.style.animation = 'fadeSlideIn 0.8s ease both';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Música ────────────────────────────────────────────────────────────────
+  const audio    = document.getElementById('bg-audio');
+  const musicBtn = document.getElementById('music-btn');
+  const banner   = document.getElementById('sound-banner');
+  let isPlaying  = false;
+
+  audio.volume = 0.4;
+
+  function setPlaying(p) {
+    isPlaying = p;
+    if (p) { musicBtn.textContent='🎵'; musicBtn.classList.add('playing'); banner.classList.remove('visible'); musicBtn.setAttribute('aria-label','Silenciar música'); }
+    else   { musicBtn.textContent='🔇'; musicBtn.classList.remove('playing'); musicBtn.setAttribute('aria-label','Activar música'); }
+  }
+
+  setTimeout(()=>{ if(!isPlaying) banner.classList.add('visible'); }, 1500);
+
+  window.addEventListener('load', ()=>{
+    audio.play().then(()=>setPlaying(true)).catch(()=>setPlaying(false));
+  });
+
+  musicBtn.addEventListener('click', ()=>{
+    if(isPlaying){ audio.pause(); setPlaying(false); }
+    else { audio.play().then(()=>setPlaying(true)).catch(e=>console.warn(e)); }
+  });
+
+  audio.addEventListener('pause', ()=>{ if(!audio.ended) setPlaying(false); });
+  audio.addEventListener('play',  ()=>setPlaying(true));
+  </script>
+</body>
+</html>
